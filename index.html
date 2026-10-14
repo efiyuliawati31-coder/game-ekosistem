@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balapan Ekosistem - Duel Cepat Tepat Kelas 5 SD</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #134e4a 0%, #064e3b 50%, #022c22 100%);
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .font-fredoka {
+            font-family: 'Fredoka', cursive;
+        }
+
+        .buzzer-btn {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .buzzer-btn:active, .buzzer-btn.active-press {
+            transform: scale(0.92) translateY(6px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.4) !important;
+        }
+
+        .glow-green {
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.6);
+        }
+
+        .glow-blue {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+        }
+
+        .glow-yellow {
+            box-shadow: 0 0 30px rgba(234, 179, 8, 0.8);
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        .pulse-fast {
+            animation: pulse-ring 0.6s infinite ease-in-out;
+        }
+
+        @keyframes float-leaf {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .floating-leaf {
+            position: absolute;
+            animation: float-leaf 4s infinite linear;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="text-white flex flex-col justify-between p-2 sm:p-4 min-h-screen relative overflow-x-hidden">
+
+    <!-- Top Navigation & Controls -->
+    <header class="w-full max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-2 bg-emerald-950/80 backdrop-blur border border-emerald-700/50 p-3 sm:p-4 rounded-2xl shadow-xl z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500 rounded-xl flex items-center justify-center text-emerald-950 text-2xl font-bold shadow-lg">
+                <i class="fa-solid fa-leaf"></i>
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-black font-fredoka text-emerald-300 tracking-wide leading-none">
+                    BALAPAN EKOSISTEM
+                </h1>
+                <p class="text-xs text-emerald-200/80 font-semibold">Quiz Cepat Tepat SD Kelas 5</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+            <!-- Mode Switcher -->
+            <button id="mode-toggle-btn" onclick="toggleGameMode()" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-emerald-800 hover:bg-emerald-700 active:scale-95 text-emerald-100 rounded-xl border border-emerald-600 transition flex items-center gap-2 font-bold shadow">
+                <i class="fa-solid fa-bolt text-yellow-400"></i>
+                <span id="mode-label">Mode: Rebutan Buzzer</span>
+            </button>
+
+            <!-- Sound Toggle -->
+            <button id="sound-btn" onclick="toggleSound()" class="p-2 sm:px-3 sm:py-2 bg-emerald-800 hover:bg-emerald-700 active:scale-95 text-emerald-100 rounded-xl border border-emerald-600 transition flex items-center gap-2 font-bold shadow" title="Suara">
+                <i id="sound-icon" class="fa-solid fa-volume-high text-emerald-300"></i>
+            </button>
+
+            <!-- Reset / Restart Button -->
+            <button onclick="confirmRestart()" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white rounded-xl border border-rose-400 transition font-bold shadow flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span class="hidden sm:inline">Ulangi</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Arena Container -->
+    <main class="w-full max-w-5xl mx-auto my-3 flex-1 flex flex-col gap-4 z-10">
+
+        <!-- Race Track Progress Bar -->
+        <div class="bg-emerald-900/90 border border-emerald-700/60 rounded-2xl p-3 sm:p-4 shadow-2xl relative overflow-hidden">
+            <div class="flex justify-between text-xs sm:text-sm font-bold text-emerald-200 mb-2 px-1">
+                <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-flag-checkered"></i> START</span>
+                <span class="text-yellow-300 font-extrabold font-fredoka tracking-wider">GARIS FINISH (TARGET 500 PTS)</span>
+                <span class="flex items-center gap-1 text-emerald-400">FINISH <i class="fa-solid fa-trophy text-yellow-400"></i></span>
+            </div>
+
+            <!-- Team 1 Track (Tim Hijau) -->
+            <div class="mb-3 relative">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-emerald-300 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400 inline-block shadow"></span>
+                        TIM HIJAU (RUSA) <span class="text-xs font-normal text-emerald-200/70">(Tombol 'A' / Buzzer Kiri)</span>
+                    </span>
+                    <span id="score-team1" class="font-fredoka text-lg font-bold text-emerald-300">0 Pts</span>
+                </div>
+                <div class="w-full h-7 bg-emerald-950/80 rounded-full border border-emerald-700/50 p-1 relative overflow-hidden flex items-center">
+                    <div id="progress-team1" class="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full transition-all duration-500 w-[0%] flex items-center justify-end pr-1 shadow-md">
+                    </div>
+                    <!-- Mascot Marker 1 -->
+                    <div id="mascot-team1" class="absolute left-[0%] -translate-x-1/2 transition-all duration-500 text-xl filter drop-shadow-md z-10">
+                        🦌
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team 2 Track (Tim Biru) -->
+            <div class="relative">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-blue-300 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-blue-400 inline-block shadow"></span>
+                        TIM BIRU (ELANG) <span class="text-xs font-normal text-blue-200/70">(Tombol 'L' / Buzzer Kanan)</span>
+                    </span>
+                    <span id="score-team2" class="font-fredoka text-lg font-bold text-blue-300">0 Pts</span>
+                </div>
+                <div class="w-full h-7 bg-emerald-950/80 rounded-full border border-blue-900/50 p-1 relative overflow-hidden flex items-center">
+                    <div id="progress-team2" class="h-full bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full transition-all duration-500 w-[0%] flex items-center justify-end pr-1 shadow-md">
+                    </div>
+                    <!-- Mascot Marker 2 -->
+                    <div id="mascot-team2" class="absolute left-[0%] -translate-x-1/2 transition-all duration-500 text-xl filter drop-shadow-md z-10">
+                        🦅
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Card & Timer Area -->
+        <div class="bg-emerald-900/80 border border-emerald-600/50 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col justify-between relative min-h-[220px]">
+
+            <!-- Category & Round Info Header -->
+            <div class="flex flex-wrap justify-between items-center gap-2 border-b border-emerald-700/50 pb-3">
+                <div class="flex items-center gap-2">
+                    <span id="category-badge" class="px-3 py-1 bg-emerald-700/80 border border-emerald-500/50 text-emerald-200 text-xs font-bold rounded-lg uppercase tracking-wider">
+                        Rantai Makanan
+                    </span>
+                    <span id="difficulty-badge" class="px-2.5 py-1 bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold rounded-lg">
+                        100 Poin
+                    </span>
+                </div>
+                <div class="text-xs sm:text-sm text-emerald-300 font-bold">
+                    Soal <span id="current-q-num" class="text-yellow-300 font-fredoka text-base">1</span> dari <span id="total-q-num" class="font-fredoka text-base">15</span>
+                </div>
+            </div>
+
+            <!-- Question Text -->
+            <div class="my-4 text-center">
+                <p id="question-text" class="text-lg sm:text-2xl font-bold text-white leading-relaxed font-fredoka drop-shadow-sm">
+                    Memuat pertanyaan ekosistem...
+                </p>
+            </div>
+
+            <!-- Timer Bar -->
+            <div class="w-full bg-emerald-950 rounded-full h-3 overflow-hidden border border-emerald-700/40 p-0.5 relative">
+                <div id="timer-bar" class="bg-gradient-to-r from-yellow-400 via-amber-500 to-red-500 h-full rounded-full w-full transition-all duration-100"></div>
+            </div>
+            <div class="flex justify-between items-center text-xs text-emerald-300 font-bold mt-1">
+                <span><i class="fa-regular fa-clock"></i> Sisa Waktu</span>
+                <span id="timer-text" class="font-fredoka text-sm text-yellow-300">10s</span>
+            </div>
+        </div>
+
+        <!-- Active Status Banner / Buzzer Prompt -->
+        <div id="status-banner" class="bg-emerald-800/90 border border-emerald-500/50 rounded-xl p-3 text-center text-sm sm:text-base font-extrabold text-yellow-300 shadow-lg flex items-center justify-center gap-2">
+            <i class="fa-solid fa-hand-pointer animate-bounce text-yellow-400"></i>
+            <span id="status-text">TEKAN BUZZER DENGAN CEPT UNTUK MENJAWAB!</span>
+        </div>
+
+        <!-- Buzzers & Answer Choice Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+            <!-- Team 1 Buzzer Column (Desktop: Left, Mobile: Top/Side) -->
+            <div class="md:col-span-3 flex flex-col justify-center items-center">
+                <button id="buzzer-team1" onclick="triggerBuzzer(1)" class="buzzer-btn w-full h-32 sm:h-36 bg-gradient-to-b from-emerald-500 to-emerald-700 border-4 border-emerald-300 rounded-2xl flex flex-col justify-center items-center shadow-[0_8px_0_#065f46] hover:brightness-110 active:shadow-none font-fredoka group transition-all">
+                    <span class="text-3xl sm:text-4xl mb-1">🦌</span>
+                    <span class="text-lg font-black text-white group-hover:scale-105 transition">BUZZER HIJAU</span>
+                    <span class="text-xs bg-emerald-900/60 text-emerald-200 px-2 py-0.5 rounded-md mt-1 border border-emerald-400/30">TEKAN 'A'</span>
+                </button>
+            </div>
+
+            <!-- Answer Options (4 Buttons) -->
+            <div class="md:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button id="opt-0" onclick="submitAnswer(0)" disabled class="answer-option bg-emerald-900/90 border-2 border-emerald-700 hover:border-emerald-400 hover:bg-emerald-800 disabled:opacity-50 disabled:hover:border-emerald-700 disabled:hover:bg-emerald-900/90 text-left p-3.5 rounded-xl flex items-center gap-3 transition shadow-md group">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-800 border border-emerald-600 text-emerald-300 font-bold flex items-center justify-center text-sm font-fredoka shrink-0 group-hover:bg-emerald-600 group-hover:text-white">A</span>
+                    <span id="opt-text-0" class="text-sm font-bold text-emerald-100 leading-snug">Pilihan A</span>
+                </button>
+
+                <button id="opt-1" onclick="submitAnswer(1)" disabled class="answer-option bg-emerald-900/90 border-2 border-emerald-700 hover:border-emerald-400 hover:bg-emerald-800 disabled:opacity-50 disabled:hover:border-emerald-700 disabled:hover:bg-emerald-900/90 text-left p-3.5 rounded-xl flex items-center gap-3 transition shadow-md group">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-800 border border-emerald-600 text-emerald-300 font-bold flex items-center justify-center text-sm font-fredoka shrink-0 group-hover:bg-emerald-600 group-hover:text-white">B</span>
+                    <span id="opt-text-1" class="text-sm font-bold text-emerald-100 leading-snug">Pilihan B</span>
+                </button>
+
+                <button id="opt-2" onclick="submitAnswer(2)" disabled class="answer-option bg-emerald-900/90 border-2 border-emerald-700 hover:border-emerald-400 hover:bg-emerald-800 disabled:opacity-50 disabled:hover:border-emerald-700 disabled:hover:bg-emerald-900/90 text-left p-3.5 rounded-xl flex items-center gap-3 transition shadow-md group">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-800 border border-emerald-600 text-emerald-300 font-bold flex items-center justify-center text-sm font-fredoka shrink-0 group-hover:bg-emerald-600 group-hover:text-white">C</span>
+                    <span id="opt-text-2" class="text-sm font-bold text-emerald-100 leading-snug">Pilihan C</span>
+                </button>
+
+                <button id="opt-3" onclick="submitAnswer(3)" disabled class="answer-option bg-emerald-900/90 border-2 border-emerald-700 hover:border-emerald-400 hover:bg-emerald-800 disabled:opacity-50 disabled:hover:border-emerald-700 disabled:hover:bg-emerald-900/90 text-left p-3.5 rounded-xl flex items-center gap-3 transition shadow-md group">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-800 border border-emerald-600 text-emerald-300 font-bold flex items-center justify-center text-sm font-fredoka shrink-0 group-hover:bg-emerald-600 group-hover:text-white">D</span>
+                    <span id="opt-text-3" class="text-sm font-bold text-emerald-100 leading-snug">Pilihan D</span>
+                </button>
+            </div>
+
+            <!-- Team 2 Buzzer Column -->
+            <div class="md:col-span-3 flex flex-col justify-center items-center">
+                <button id="buzzer-team2" onclick="triggerBuzzer(2)" class="buzzer-btn w-full h-32 sm:h-36 bg-gradient-to-b from-blue-500 to-blue-700 border-4 border-blue-300 rounded-2xl flex flex-col justify-center items-center shadow-[0_8px_0_#1e3a8a] hover:brightness-110 active:shadow-none font-fredoka group transition-all">
+                    <span class="text-3xl sm:text-4xl mb-1">🦅</span>
+                    <span class="text-lg font-black text-white group-hover:scale-105 transition">BUZZER BIRU</span>
+                    <span class="text-xs bg-blue-950/60 text-blue-200 px-2 py-0.5 rounded-md mt-1 border border-blue-400/30">TEKAN 'L'</span>
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer Info -->
+    <footer class="w-full max-w-5xl mx-auto text-center py-2 text-xs text-emerald-300/70 font-semibold z-10">
+        Media Pembelajaran IPA SD Kelas 5 • Materi: Rantai Makanan, Komponen Ekosistem & Simbiosis
+    </footer>
+
+    <!-- Result & Feedback Overlay Popups -->
+    <!-- Correct/Wrong Modal Banner -->
+    <div id="feedback-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300">
+        <div id="feedback-card" class="bg-emerald-900 border-2 border-emerald-500 rounded-3xl p-6 max-w-lg w-full text-center shadow-2xl transform scale-95 transition-all">
+            <div id="feedback-icon" class="text-6xl mb-3">🎉</div>
+            <h2 id="feedback-title" class="text-2xl sm:text-3xl font-black font-fredoka mb-2 text-yellow-300">BENAR DINGIN!</h2>
+            <p id="feedback-team" class="text-sm font-extrabold text-emerald-200 mb-2">Tim Hijau mendapatkan +100 Poin!</p>
+            <div id="feedback-explanation" class="bg-emerald-950/80 p-3.5 rounded-xl border border-emerald-700/50 text-xs sm:text-sm text-emerald-100 text-left mb-5 leading-relaxed">
+                Penjelasan soal akan tampil di sini.
+            </div>
+            <button onclick="nextQuestion()" class="w-full py-3 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-emerald-950 font-black font-fredoka rounded-xl shadow-lg transition active:scale-95 text-base flex items-center justify-center gap-2">
+                <span>LANJUT SOAL BERIKUTNYA</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Victory Screen / Game Over Modal -->
+    <div id="victory-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-emerald-950 border-4 border-yellow-400/80 rounded-3xl p-6 sm:p-8 max-w-xl w-full text-center shadow-2xl relative overflow-hidden">
+            <div class="text-5xl mb-2 animate-bounce">🏆</div>
+            <h2 class="text-3xl sm:text-4xl font-black font-fredoka text-yellow-300 mb-1 tracking-wide">
+                JUARA EKOSISTEM!
+            </h2>
+            <p class="text-emerald-200 text-xs sm:text-sm font-semibold mb-6">Pertandingan Cepat Tepat Selesai</p>
+
+            <!-- Winner Display -->
+            <div id="winner-box" class="bg-gradient-to-r from-emerald-800 to-teal-800 p-4 rounded-2xl border-2 border-emerald-400 mb-6 shadow-inner">
+                <p id="winner-name" class="text-2xl sm:text-3xl font-black font-fredoka text-white mb-1">
+                    TIM HIJAU MENANG!
+                </p>
+                <p id="winner-scores" class="text-sm font-bold text-emerald-200">
+                    Skor Akhir: Tim Hijau (500 Pts) vs Tim Biru (300 Pts)
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-left text-xs mb-6 bg-emerald-900/60 p-3 rounded-xl border border-emerald-700/50">
+                <div class="text-emerald-200">
+                    <span class="font-bold text-emerald-400 block">Akurasi Tim Hijau:</span>
+                    <span id="stats-team1">0/0 Benar</span>
+                </div>
+                <div class="text-emerald-200">
+                    <span class="font-bold text-emerald-400 block">Akurasi Tim Biru:</span>
+                    <span id="stats-team2">0/0 Benar</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="restartGame()" class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black font-fredoka rounded-xl shadow-lg transition active:scale-95 text-base flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i>
+                    <span>MAIN LAGI</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Sound Effects (Standalone, no external audio files)
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+            }
+
+            playBuzzer() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+                
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.15);
+                
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.2);
+            }
+
+            playCorrect() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.08 + 0.25);
+                    
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.08);
+                    osc.stop(this.ctx.currentTime + idx * 0.08 + 0.25);
+                });
+            }
+
+            playWrong() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(110, this.ctx.currentTime + 0.3);
+
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+
+            playWin() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const arpeggio = [440, 554.37, 659.25, 880, 659.25, 880];
+                arpeggio.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.25, this.ctx.currentTime + i * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.12 + 0.3);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + i * 0.12);
+                    osc.stop(this.ctx.currentTime + i * 0.12 + 0.3);
+                });
+            }
+
+            playTick() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1000, this.ctx.currentTime);
+
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.04);
+            }
+        }
+
+        const soundFX = new SoundFX();
+
+        // Comprehensive Question Bank for Grade 5 Elementary School Ecosystem Unit
+        const QUESTION_BANK = [
+            {
+                q: "Organisme yang memiliki kemampuan membuat makanannya sendiri melalui proses fotosintesis dalam rantai makanan dinamakan...",
+                options: ["Pengurai (Dekomposer)", "Produsen", "Konsumen I", "Konsumen II"],
+                correct: 1,
+                category: "Rantai Makanan",
+                points: 100,
+                explanation: "Tumbuhan hijau berperan sebagai Produsen karena mampu menghasilkan makanan sendiri menggunakan bantuan cahaya matahari melalui fotosintesis."
+            },
+            {
+                q: "Di dalam ekosistem kebun: Padi ➔ Belalang ➔ Katak ➔ Ular ➔ Elang. Organisme yang bertindak sebagai Konsumen Tingkat I adalah...",
+                options: ["Padi", "Belalang", "Katak", "Ular"],
+                correct: 1,
+                category: "Rantai Makanan",
+                points: 100,
+                explanation: "Belalang adalah Konsumen Tingkat I (Herbivora) karena langsung memakan produsen yaitu tumbuhan padi."
+            },
+            {
+                q: "Berikut ini yang merupakan kelompok komponen ABIOTIK dalam suatu ekosistem adalah...",
+                options: ["Cacing, rumput, dan bakteri", "Air, tanah, dan cahaya matahari", "Pohon mangga, elang, dan udara", "Ikan, air, dan tanaman teratai"],
+                correct: 1,
+                category: "Komponen Ekosistem",
+                points: 100,
+                explanation: "Komponen abiotik adalah benda-benda tak hidup dalam lingkungan, seperti air, tanah, batu, suhu, dan cahaya matahari."
+            },
+            {
+                q: "Peran utama Jamur dan Bakteri dalam rantai makanan adalah sebagai...",
+                options: ["Produsen utama", "Konsumen Puncak", "Pengurai (Dekomposer)", "Karnivora utama"],
+                correct: 2,
+                category: "Rantai Makanan",
+                points: 100,
+                explanation: "Jamur dan bakteri bertindak sebagai pengurai yang membusukkan sisa makhluk hidup mati menjadi zat hara untuk tanah."
+            },
+            {
+                q: "Hubungan simbiosis antara bunga dengan lebah dinamakan simbiosis...",
+                options: ["Mutualisme", "Komensalisme", "Parasitisme", "Netralisme"],
+                correct: 0,
+                category: "Simbiosis",
+                points: 100,
+                explanation: "Simbiosis Mutualisme menguntungkan kedua pihak: lebah mendapat nektar/madu, sedangkan bunga dibantu penyerbukannya."
+            },
+            {
+                q: "Di sawah, jika populasi katak menurun drastis karena ditangkap manusia, maka akibat yang akan terjadi adalah...",
+                options: ["Populasi belalang akan meningkat pesat", "Populasi padi akan membaik pesat", "Populasi ular akan bertambah banyak", "Elang akan berkembang pesat"],
+                correct: 0,
+                category: "Jaring Makanan",
+                points: 100,
+                explanation: "Karena katak adalah pemangsa belalang, jika katak berkurang maka pemangsa belalang berkurang sehingga populasi belalang melonjak."
+            },
+            {
+                q: "Contoh hubungan Simbiosis Parasitisme terjadi pada hubungan antara...",
+                options: ["Ikan Remora dan Ikan Hiu", "Tumbuhan Benalu dan Pohon Inang", "Burung Jalak dan Kerbau", "Tanaman Anggrek dan Pohon Besar"],
+                correct: 1,
+                category: "Simbiosis",
+                points: 100,
+                explanation: "Benalu mengambil nutrisi dari pohon inang (inang dirugikan, benalu diuntungkan), sehingga disebut Parasitisme."
+            },
+            {
+                q: "Simbiosis Komensalisme ditunjukkan oleh contoh interaksi antara...",
+                options: ["Cacing pita di usus manusia", "Bunga anggrek yang menempel pada pohon besar", "Kutu dengan kucing", "Ular dengan tikus"],
+                correct: 1,
+                category: "Simbiosis",
+                points: 100,
+                explanation: "Anggrek diuntungkan karena mendapat tempat tinggi untuk sinar matahari, sedangkan pohon inang tidak dirugikan maupun diuntungkan."
+            },
+            {
+                q: "Kumpulan dari beberapa rantai makanan yang saling berhubungan dan tumpang tindih dalam suatu ekosistem dinamakan...",
+                options: ["Piramida makanan", "Jaring-jaring makanan", "Ekosistem buatan", "Siklus nutrisi"],
+                correct: 1,
+                category: "Jaring Makanan",
+                points: 100,
+                explanation: "Jaring-jaring makanan terdiri dari gabungan banyak rantai makanan yang saling terhubung satu sama lain."
+            },
+            {
+                q: "Di dalam ekosistem laut, makhluk hidup mikroskopis yang berperan sebagai produsen utama adalah...",
+                options: ["Zooplankton", "Fitoplankton", "Ikan Kecil", "Ubur-ubur"],
+                correct: 1,
+                category: "Ekosistem Laut",
+                points: 100,
+                explanation: "Fitoplankton adalah tumbuhan bersel tunggal melayang di laut yang berklorofil sehingga menjadi produsen utama."
+            },
+            {
+                q: "Hewan yang memakan tumbuhan sekaligus hewan lain (pemakan segala) tergolong dalam kelompok...",
+                options: ["Herbivora", "Karnivora", "Omnivora", "Insektivora"],
+                correct: 2,
+                category: "Jenis Makanan",
+                points: 100,
+                explanation: "Omnivora adalah hewan pemakan segala (tumbuhan dan daging/hewan lain), contohnya ayam, tikus, dan monyet."
+            },
+            {
+                q: "Berikut ini yang termasuk contoh ekosistem BUATAN (dibuat oleh manusia) adalah...",
+                options: ["Hutan hujan tropis", "Sawah dan Kolam Ikan", "Danau alami", "Laut lepas"],
+                correct: 1,
+                category: "Komponen Ekosistem",
+                points: 100,
+                explanation: "Sawah, kolam, dan akuarium sengaja dibuat oleh manusia untuk kebutuhan tertentu sehingga termasuk ekosistem buatan."
+            },
+            {
+                q: "Sumber energi utama bagi seluruh rantai makanan dan kehidupan di bumi berasal dari...",
+                options: ["Air hujan", "Cahaya Matahari", "Zat hara tanah", "Oksigen udara"],
+                correct: 1,
+                category: "Komponen Ekosistem",
+                points: 100,
+                explanation: "Matahari adalah sumber energi utama yang ditangkap tumbuhan untuk fotosintesis dan mengalir ke seluruh rantai makanan."
+            },
+            {
+                q: "Tindakan manusia yang dapat merusak keseimbangan ekosistem hutan adalah...",
+                options: ["Melakukan reboisasi hutan gundul", "Penebangan liar dan pembakaran hutan", "Membuat sengkedan di lereng", "Mendirikan cagar alam"],
+                correct: 1,
+                category: "Keseimbangan Ekosistem",
+                points: 100,
+                explanation: "Penebangan liar merusak tempat tinggal (habitat) hewan dan memusnahkan produsen utama di hutan."
+            },
+            {
+                q: "Elang dan Harimau memiliki ciri khas gigi/paruh yang tajam dan kuat karena peran mereka sebagai...",
+                options: ["Produsen utama", "Konsumen Herbivora", "Konsumen Karnivora", "Pengurai organik"],
+                correct: 2,
+                category: "Adaptasi Makhluk Hidup",
+                points: 100,
+                explanation: "Karnivora memakan daging sehingga memiliki adaptasi pemangsa seperti paruh tajam atau gigi taring untuk mengoyak mangsa."
+            }
+        ];
+
+        // Game State Variables
+        let currentQuestions = [];
+        let currentQIndex = 0;
+        let scoreTeam1 = 0;
+        let scoreTeam2 = 0;
+        let correctCountTeam1 = 0;
+        let correctCountTeam2 = 0;
+        let attemptsTeam1 = 0;
+        let attemptsTeam2 = 0;
+        
+        const TARGET_SCORE = 500;
+        const TIMER_MAX = 10; // seconds
+        let timerSeconds = TIMER_MAX;
+        let timerInterval = null;
+
+        // Modes: 'buzzer' (Rebutan) or 'speed' (Serentak)
+        let gameMode = 'buzzer';
+        let activeBuzzerTeam = null; // 1 or 2
+        let questionState = 'WAITING_BUZZER'; // 'WAITING_BUZZER', 'ANSWERING', 'RESULT'
+
+        // Initialize Game
+        window.onload = function() {
+            restartGame();
+            
+            // Global Keyboard Event Listener for Buzzers (Key A & Key L)
+            document.addEventListener('keydown', function(e) {
+                const key = e.key.toLowerCase();
+                
+                // Prevent trigger if feedback popup is open
+                if (!document.getElementById('feedback-modal').classList.contains('hidden')) return;
+                if (!document.getElementById('victory-modal').classList.contains('hidden')) return;
+
+                if (gameMode === 'buzzer' && questionState === 'WAITING_BUZZER') {
+                    if (key === 'a') {
+                        triggerBuzzer(1);
+                    } else if (key === 'l') {
+                        triggerBuzzer(2);
+                    }
+                }
+            });
+        };
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function restartGame() {
+            currentQuestions = shuffleArray(QUESTION_BANK);
+            currentQIndex = 0;
+            scoreTeam1 = 0;
+            scoreTeam2 = 0;
+            correctCountTeam1 = 0;
+            correctCountTeam2 = 0;
+            attemptsTeam1 = 0;
+            attemptsTeam2 = 0;
+
+            document.getElementById('victory-modal').classList.add('hidden');
+            document.getElementById('feedback-modal').classList.add('hidden');
+
+            updateScoresUI();
+            loadQuestion();
+        }
+
+        function confirmRestart() {
+            if (confirm("Apakah ingin mengulang pertandingan dari awal?")) {
+                restartGame();
+            }
+        }
+
+        function toggleSound() {
+            soundFX.enabled = !soundFX.enabled;
+            const icon = document.getElementById('sound-icon');
+            if (soundFX.enabled) {
+                icon.className = "fa-solid fa-volume-high text-emerald-300";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-rose-400";
+            }
+        }
+
+        function toggleGameMode() {
+            if (gameMode === 'buzzer') {
+                gameMode = 'speed';
+                document.getElementById('mode-label').innerText = "Mode: Speed Run";
+            } else {
+                gameMode = 'buzzer';
+                document.getElementById('mode-label').innerText = "Mode: Rebutan Buzzer";
+            }
+            restartGame();
+        }
+
+        function loadQuestion() {
+            if (currentQIndex >= currentQuestions.length) {
+                // Reshuffle questions if exceeded
+                currentQuestions = shuffleArray(QUESTION_BANK);
+                currentQIndex = 0;
+            }
+
+            const qData = currentQuestions[currentQIndex];
+
+            document.getElementById('current-q-num').innerText = currentQIndex + 1;
+            document.getElementById('total-q-num').innerText = currentQuestions.length;
+            document.getElementById('category-badge').innerText = qData.category;
+            document.getElementById('difficulty-badge').innerText = qData.points + " Poin";
+            document.getElementById('question-text').innerText = qData.q;
+
+            // Render options
+            for (let i = 0; i < 4; i++) {
+                const optBtn = document.getElementById(`opt-${i}`);
+                const optText = document.getElementById(`opt-text-${i}`);
+                optText.innerText = qData.options[i];
+                
+                // Reset styling
+                optBtn.className = "answer-option bg-emerald-900/90 border-2 border-emerald-700 hover:border-emerald-400 hover:bg-emerald-800 disabled:opacity-50 text-left p-3.5 rounded-xl flex items-center gap-3 transition shadow-md group";
+                optBtn.disabled = true;
+            }
+
+            // Reset buzzers visual
+            document.getElementById('buzzer-team1').classList.remove('glow-green', 'active-press');
+            document.getElementById('buzzer-team2').classList.remove('glow-blue', 'active-press');
+
+            if (gameMode === 'buzzer') {
+                questionState = 'WAITING_BUZZER';
+                activeBuzzerTeam = null;
+                document.getElementById('status-banner').className = "bg-amber-800/90 border border-amber-500/50 rounded-xl p-3 text-center text-sm sm:text-base font-extrabold text-yellow-300 shadow-lg flex items-center justify-center gap-2";
+                document.getElementById('status-text').innerText = "SIAP-SIAP! TEKAN BUZZER ('A' atau 'L') UNTUK MENJAWAB!";
+                resetTimer(false); // don't start timer until buzzed
+            } else {
+                // Speed run mode: Options active immediately
+                questionState = 'ANSWERING';
+                activeBuzzerTeam = null;
+                enableAnswerButtons(true);
+                document.getElementById('status-banner').className = "bg-emerald-800/90 border border-emerald-500/50 rounded-xl p-3 text-center text-sm sm:text-base font-extrabold text-emerald-200 shadow-lg flex items-center justify-center gap-2";
+                document.getElementById('status-text').innerText = "MODE SPEED RUN: CEPAT PILIH JAWABAN YANG BENAR!";
+                startTimer();
+            }
+        }
+
+        function resetTimer(autoStart = true) {
+            clearInterval(timerInterval);
+            timerSeconds = TIMER_MAX;
+            updateTimerUI();
+            if (autoStart) startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds -= 0.1;
+                if (timerSeconds <= 0) {
+                    timerSeconds = 0;
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+                updateTimerUI();
+            }, 100);
+        }
+
+        function updateTimerUI() {
+            const pct = Math.max(0, (timerSeconds / TIMER_MAX) * 100);
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = pct + "%";
+            document.getElementById('timer-text').innerText = Math.ceil(timerSeconds) + "s";
+
+            if (timerSeconds <= 3 && timerSeconds > 0) {
+                soundFX.playTick();
+            }
+        }
+
+        function triggerBuzzer(teamNum) {
+            if (questionState !== 'WAITING_BUZZER') return;
+
+            questionState = 'ANSWERING';
+            activeBuzzerTeam = teamNum;
+
+            soundFX.playBuzzer();
+
+            const b1 = document.getElementById('buzzer-team1');
+            const b2 = document.getElementById('buzzer-team2');
+
+            if (teamNum === 1) {
+                b1.classList.add('glow-green', 'active-press');
+                document.getElementById('status-banner').className = "bg-emerald-600 border border-emerald-300 rounded-xl p-3 text-center text-sm sm:text-base font-extrabold text-white shadow-lg flex items-center justify-center gap-2 pulse-fast";
+                document.getElementById('status-text').innerText = "🦌 TIM HIJAU MENEKAN BUZZER! PILIH JAWABAN!";
+            } else {
+                b2.classList.add('glow-blue', 'active-press');
+                document.getElementById('status-banner').className = "bg-blue-600 border border-blue-300 rounded-xl p-3 text-center text-sm sm:text-base font-extrabold text-white shadow-lg flex items-center justify-center gap-2 pulse-fast";
+                document.getElementById('status-text').innerText = "🦅 TIM BIRU MENEKAN BUZZER! PILIH JAWABAN!";
+            }
+
+            enableAnswerButtons(true);
+            resetTimer(true);
+        }
+
+        function enableAnswerButtons(enable) {
+            for (let i = 0; i < 4; i++) {
+                const btn = document.getElementById(`opt-${i}`);
+                btn.disabled = !enable;
+            }
+        }
+
+        function submitAnswer(selectedIndex) {
+            if (questionState !== 'ANSWERING') return;
+
+            clearInterval(timerInterval);
+            questionState = 'RESULT';
+
+            const qData = currentQuestions[currentQIndex];
+            const isCorrect = selectedIndex === qData.correct;
+
+            // Identify which team answered
+            let answeringTeam = activeBuzzerTeam || 1; // Default to 1 if speed mode without specific buzzer
+
+            if (answeringTeam === 1) attemptsTeam1++;
+            else attemptsTeam2++;
+
+            // Highlight chosen option
+            const chosenBtn = document.getElementById(`opt-${selectedIndex}`);
+            const correctBtn = document.getElementById(`opt-${qData.correct}`);
+
+            if (isCorrect) {
+                soundFX.playCorrect();
+                chosenBtn.classList.add('bg-emerald-600', 'border-emerald-300', 'text-white');
+
+                // Award points
+                const pts = qData.points;
+                if (answeringTeam === 1) {
+                    scoreTeam1 += pts;
+                    correctCountTeam1++;
+                } else {
+                    scoreTeam2 += pts;
+                    correctCountTeam2++;
+                }
+
+                showFeedbackModal(
+                    true,
+                    answeringTeam,
+                    `BENAR DINGIN! +${pts} POIN`,
+                    `${answeringTeam === 1 ? 'Tim Hijau 🦌' : 'Tim Biru 🦅'} berhasil menjawab dengan tepat dan lebih cepat!`,
+                    qData.explanation
+                );
+            } else {
+                soundFX.playWrong();
+                chosenBtn.classList.add('bg-rose-700', 'border-rose-400', 'text-white');
+                correctBtn.classList.add('bg-emerald-600', 'border-emerald-300', 'text-white');
+
+                // Penalty points for wrong answer in buzzer mode
+                const penalty = 30;
+                if (answeringTeam === 1) {
+                    scoreTeam1 = Math.max(0, scoreTeam1 - penalty);
+                } else {
+                    scoreTeam2 = Math.max(0, scoreTeam2 - penalty);
+                }
+
+                showFeedbackModal(
+                    false,
+                    answeringTeam,
+                    `KURANG TEPAT! -${penalty} POIN`,
+                    `Jawaban ${answeringTeam === 1 ? 'Tim Hijau' : 'Tim Biru'} kurang tepat. Jawaban yang benar adalah: ${qData.options[qData.correct]}`,
+                    qData.explanation
+                );
+            }
+
+            updateScoresUI();
+        }
+
+        function handleTimeOut() {
+            soundFX.playWrong();
+            questionState = 'RESULT';
+
+            const qData = currentQuestions[currentQIndex];
+            
+            showFeedbackModal(
+                false,
+                0,
+                "WAKTU HABIS!",
+                "Sayang sekali, tidak ada tim yang berhasil menjawab tepat waktu.",
+                qData.explanation
+            );
+        }
+
+        function updateScoresUI() {
+            document.getElementById('score-team1').innerText = scoreTeam1 + " Pts";
+            document.getElementById('score-team2').innerText = scoreTeam2 + " Pts";
+
+            // Progress percentages based on TARGET_SCORE
+            const pct1 = Math.min(100, Math.max(0, (scoreTeam1 / TARGET_SCORE) * 100));
+            const pct2 = Math.min(100, Math.max(0, (scoreTeam2 / TARGET_SCORE) * 100));
+
+            document.getElementById('progress-team1').style.width = pct1 + "%";
+            document.getElementById('progress-team2').style.width = pct2 + "%";
+
+            document.getElementById('mascot-team1').style.left = pct1 + "%";
+            document.getElementById('mascot-team2').style.left = pct2 + "%";
+
+            // Check if any team won
+            if (scoreTeam1 >= TARGET_SCORE || scoreTeam2 >= TARGET_SCORE) {
+                setTimeout(showVictoryModal, 1200);
+            }
+        }
+
+        function showFeedbackModal(isCorrect, teamNum, title, subtitle, explanation) {
+            const modal = document.getElementById('feedback-modal');
+            const card = document.getElementById('feedback-card');
+            const icon = document.getElementById('feedback-icon');
+            const titleEl = document.getElementById('feedback-title');
+            const teamEl = document.getElementById('feedback-team');
+            const expEl = document.getElementById('feedback-explanation');
+
+            if (isCorrect) {
+                icon.innerText = "🌟";
+                card.className = "bg-emerald-900 border-4 border-emerald-400 rounded-3xl p-6 max-w-lg w-full text-center shadow-2xl transform scale-100 transition-all";
+                titleEl.className = "text-2xl sm:text-3xl font-black font-fredoka mb-1 text-emerald-300";
+            } else {
+                icon.innerText = "💡";
+                card.className = "bg-rose-950 border-4 border-rose-500 rounded-3xl p-6 max-w-lg w-full text-center shadow-2xl transform scale-100 transition-all";
+                titleEl.className = "text-2xl sm:text-3xl font-black font-fredoka mb-1 text-rose-300";
+            }
+
+            titleEl.innerText = title;
+            teamEl.innerText = subtitle;
+            expEl.innerHTML = `<strong>Penjelasan Edukasi:</strong><br>${explanation}`;
+
+            modal.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            document.getElementById('feedback-modal').classList.add('hidden');
+            
+            if (scoreTeam1 >= TARGET_SCORE || scoreTeam2 >= TARGET_SCORE) {
+                showVictoryModal();
+            } else {
+                currentQIndex++;
+                loadQuestion();
+            }
+        }
+
+        function showVictoryModal() {
+            soundFX.playWin();
+            const modal = document.getElementById('victory-modal');
+            const winnerName = document.getElementById('winner-name');
+            const winnerScores = document.getElementById('winner-scores');
+            
+            let winnerText = "";
+            if (scoreTeam1 > scoreTeam2) {
+                winnerText = "🎉 TIM HIJAU (RUSA) MENANG!";
+            } else if (scoreTeam2 > scoreTeam1) {
+                winnerText = "🦅 TIM BIRU (ELANG) MENANG!";
+            } else {
+                winnerText = "🤝 HASIL SERI! DUA TIM HEBAT!";
+            }
+
+            winnerName.innerText = winnerText;
+            winnerScores.innerText = `Skor Akhir: Tim Hijau (${scoreTeam1} Pts) vs Tim Biru (${scoreTeam2} Pts)`;
+
+            const acc1 = attemptsTeam1 > 0 ? Math.round((correctCountTeam1 / attemptsTeam1) * 100) : 0;
+            const acc2 = attemptsTeam2 > 0 ? Math.round((correctCountTeam2 / attemptsTeam2) * 100) : 0;
+
+            document.getElementById('stats-team1').innerText = `${correctCountTeam1}/${attemptsTeam1} Benar (${acc1}% Akurasi)`;
+            document.getElementById('stats-team2').innerText = `${correctCountTeam2}/${attemptsTeam2} Benar (${acc2}% Akurasi)`;
+
+            modal.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
